@@ -1,4 +1,3 @@
-// db.js
 import { MongoClient } from 'mongodb';
 
 class DBClient {
@@ -10,9 +9,9 @@ class DBClient {
     // Create a MongoDB connection URI
     const uri = `mongodb://${host}:${port}`;
 
-    // Remove the useUnifiedTopology option
-    this.client = new MongoClient(uri);
+    this.client = new MongoClient(uri, { useUnifiedTopology: true });
     this.database = database;
+    this.connected = false;
   }
 
   /**
@@ -20,8 +19,11 @@ class DBClient {
    * @returns {boolean} True if connected, otherwise false.
    */
   async isAlive() {
+    if (this.connected) return true;
+
     try {
       await this.client.connect();
+      this.connected = true;
       return true;
     } catch (err) {
       console.error(`MongoDB connection error: ${err.message}`);
@@ -30,6 +32,10 @@ class DBClient {
   }
 
   async nbUsers() {
+    if (!this.connected) {
+      console.error('MongoDB client not connected');
+      return 0;
+    }
     try {
       const db = this.client.db(this.database);
       const usersCollection = db.collection('users');
@@ -41,6 +47,10 @@ class DBClient {
   }
 
   async nbFiles() {
+    if (!this.connected) {
+      console.error('MongoDB client not connected');
+      return 0;
+    }
     try {
       const db = this.client.db(this.database);
       const filesCollection = db.collection('files');
@@ -54,4 +64,3 @@ class DBClient {
 
 const dbClient = new DBClient();
 export default dbClient;
-
