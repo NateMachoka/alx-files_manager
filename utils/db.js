@@ -1,63 +1,52 @@
 import { MongoClient } from 'mongodb';
 
+const { DB_HOST = 'localhost' } = process.env;
+const { DB_PORT = 27017 } = process.env;
+const { DB_DATABASE = 'files_manager' } = process.env;
+const DB_URL = `mongodb://${DB_HOST}:${DB_PORT}`;
+// const { MONGO_URL } = process.env; // Remove connection of atlas
+// const DB_URL = `${MONGO_URL}`;
+
 class DBClient {
   constructor() {
-    const host = process.env.DB_HOST || 'localhost';
-    const port = process.env.DB_PORT || 27017;
-    const database = process.env.DB_DATABASE || 'files_manager';
+    MongoClient.connect(
+      DB_URL,
+      { useUnifiedTopology: true, useNewUrlParser: true },
+      (error, client) => {
+        if (error) {
+          console.log('Database connection error', error);
+          // client.close();
+        } else {
+          this._db = client.db(DB_DATABASE);
+          this._users = this._db.collection('users');
+          this._files = this._db.collection('files');
+        }
+      },
+    );
+  }
 
-    // MongoDB connection URI
-    const uri = `mongodb://${host}:${port}`;
-    this.client = new MongoClient(uri, { useUnifiedTopology: true });
-    this.database = database;
-    this.connected = false;
+  isAlive() {
+    return !!this._db;
   }
 
   /**
-   * Checks if the MongoDB client is connected.
-   * @returns {Promise<boolean>} True if connected, otherwise false.
+   * Counts the total number of users
+   * @returns Number of users in the database
    */
-  async isAlive() {
-    if (this.connected) return true;
-
-    try {
-      await this.client.connect();
-      this.connected = true;
-      return true;
-    } catch (err) {
-      console.error(`MongoDB connection error: ${err.message}`);
-      return false;
-    }
-  }
-
   async nbUsers() {
-    if (!this.connected) {
-      console.error('MongoDB client not connected');
-      return 0;
-    }
-    try {
-      const db = this.client.db(this.database);
-      const usersCollection = db.collection('users');
-      return await usersCollection.countDocuments();
-    } catch (err) {
-      console.error(`Error counting users: ${err.message}`);
-      return 0;
-    }
+    // if (!this.isAlive()) return 0;
+    const users = await this._users.countDocuments();
+    return users;
   }
 
+  /**
+   * Counts the total number of files
+   * @returns Number of files in the database
+   */
   async nbFiles() {
-    if (!this.connected) {
-      console.error('MongoDB client not connected');
-      return 0;
-    }
-    try {
-      const db = this.client.db(this.database);
-      const filesCollection = db.collection('files');
-      return await filesCollection.countDocuments();
-    } catch (err) {
-      console.error(`Error counting files: ${err.message}`);
-      return 0;
-    }
+    // if (!this.isAlive()) return 0;
+    const files = await this._files.countDocuments();
+    return files;
   }
 }
 
