@@ -6,9 +6,8 @@ class DBClient {
     const port = process.env.DB_PORT || 27017;
     const database = process.env.DB_DATABASE || 'files_manager';
 
-    // Create a MongoDB connection URI
+    // MongoDB connection URI
     const uri = `mongodb://${host}:${port}`;
-
     this.client = new MongoClient(uri, { useUnifiedTopology: true });
     this.database = database;
     this.connected = false;
@@ -16,7 +15,7 @@ class DBClient {
 
   /**
    * Checks if the MongoDB client is connected.
-   * @returns {boolean} True if connected, otherwise false.
+   * @returns {Promise<boolean>} True if connected, otherwise false.
    */
   async isAlive() {
     if (this.connected) return true;
