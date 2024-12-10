@@ -4,7 +4,7 @@ const { DB_HOST = 'localhost' } = process.env;
 const { DB_PORT = 27017 } = process.env;
 const { DB_DATABASE = 'files_manager' } = process.env;
 const DB_URL = `mongodb://${DB_HOST}:${DB_PORT}`;
-// const { MONGO_URL } = process.env; // Remove connection of atlas
+// const { MONGO_URL } = process.env;
 // const DB_URL = `${MONGO_URL}`;
 
 class DBClient {
@@ -31,7 +31,7 @@ class DBClient {
 
   /**
    * Counts the total number of users
-   * @returns Number of users in the database
+   * @returns Number of users in the db
    */
   async nbUsers() {
     // if (!this.isAlive()) return 0;
@@ -41,7 +41,7 @@ class DBClient {
 
   /**
    * Counts the total number of files
-   * @returns Number of files in the database
+   * @returns Number of files in the db
    */
   async nbFiles() {
     // if (!this.isAlive()) return 0;
