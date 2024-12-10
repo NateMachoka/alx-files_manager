@@ -8,6 +8,9 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
+// Middleware to parse JSON request bodies
+app.use(express.json());
+
 // Load all routes from routes/index.js
 app.use('/', routes);
 
