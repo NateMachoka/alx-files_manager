@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import dbClient from '../utils/db';
+import dbClient from '../utils/db.js';
 
 class UsersController {
   static async postNew(req, res) {
